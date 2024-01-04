@@ -1,14 +1,12 @@
 from googleapiclient.discovery import build
 import json
-import os
+
 
 class Channel:
     """Класс для ютуб-канала"""
     API_KEY = 'AIzaSyCcewIqkMw786Rey_TH2XGxGNlFVgg2_Eg'
 
-
     def __init__(self, channel_id: str) -> None:
-        """Инициализация экземпляра с реальными данными канала."""
         self.channel_id = channel_id
         self.api_key = self.API_KEY
         self.youtube = build('youtube', 'v3', developerKey=self.api_key)
@@ -24,13 +22,11 @@ class Channel:
         self.view_count = int(channel_data.get('statistics', {}).get('viewCount', 0))
 
     def print_info(self) -> None:
-        """Выводит в консоль информацию о канале."""
         channel_data = self.youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
         print(json.dumps(channel_data, indent=2))
 
     @classmethod
     def get_service(cls):
-        """Возвращает объект для работы с YouTube API."""
         return build('youtube', 'v3', developerKey=cls.API_KEY)
 
     def get_channel_data(self) -> dict:
@@ -39,7 +35,6 @@ class Channel:
             return response['items'][0] if response.get('items') else {}
 
     def to_json(self, filename: str) -> None:
-        """Метод для сохранения данных о канале в JSON-файл."""
         channel_data = {
             'id': self.id,
             'title': self.title,
