@@ -25,19 +25,19 @@ class Video:
         return f"{self.video_title}"
 
 
+
 class PLVideo(Video):
-    def __init__(self, video_id, playlist_id):
+    def __init__(self, video_id='', playlist_id=''):
         super().__init__(video_id)
         self.playlist_id = playlist_id
 
-        playlists_response = self.youtube.playlistItems().list(
-            part='snippet',
-            playlistId=playlist_id
-        ).execute()
+        if playlist_id:  # Выполнять запрос только при наличии playlist_id
+            playlists_response = self.youtube.playlistItems().list(
+                part='snippet',
+                playlistId=playlist_id
+            ).execute()
 
-        self.playlists = [item['snippet']['playlistId'] for item in playlists_response['items']]
+            self.video_items = playlists_response.get('items', [])
 
     def __str__(self):
         return f"{super().__str__()}"
-
-
