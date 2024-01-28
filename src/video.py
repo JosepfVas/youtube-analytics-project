@@ -2,28 +2,41 @@ import os
 from googleapiclient.discovery import build
 
 
+class VideoIdError(Exception):
+    pass
+
+
 class Video:
 
     API_KEY = 'AIzaSyCcewIqkMw786Rey_TH2XGxGNlFVgg2_Eg'
 
     def __init__(self, video_id):
+
         self.video_id = video_id
         self.api_key = self.API_KEY
         self.youtube = build('youtube', 'v3', developerKey=self.api_key)
+        self.title = None
+        self.view_count = None
+        self.like_count = None
+        self.comment_count = None
 
-        video_response = self.youtube.videos().list(
-            part='snippet,statistics,contentDetails,topicDetails',
-            id=video_id
-        ).execute()
+        if video_id:
+            try:
+                video_response = self.youtube.videos().list(
+                    part='snippet,statistics,contentDetails,topicDetails',
+                    id=video_id
+                ).execute()
 
-        self.video_title: str = video_response['items'][0]['snippet']['title']
-        self.view_count: int = video_response['items'][0]['statistics']['viewCount']
-        self.like_count: int = video_response['items'][0]['statistics']['likeCount']
-        self.comment_count: int = video_response['items'][0]['statistics']['commentCount']
+                self.title: str = video_response['items'][0]['snippet']['title']
+                self.view_count: int = video_response['items'][0]['statistics']['viewCount']
+                self.like_count: int = video_response['items'][0]['statistics']['likeCount']
+                self.comment_count: int = video_response['items'][0]['statistics']['commentCount']
+
+            except (KeyError, IndexError):
+                raise VideoIdError("Неверная ссылка на видео")
 
     def __str__(self):
-        return f"{self.video_title}"
-
+        return f"{self.title}"
 
 
 class PLVideo(Video):
